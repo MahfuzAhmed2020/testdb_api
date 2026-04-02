@@ -1,0 +1,256 @@
+
+
+
+mvn clean spring-boot:run
+ mvn spring-boot:run      
+mvn clean install        
+ mvn clean test                 
+
+
+
+
+
+
+
+
+
+
+
+
+http://localhost:8080/users/range?start=0&end=5
+----------------------------
+
+Create_user POST http://localhost:8080/users
+
+curl --location 'http://localhost:8080/users' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "name": "joe",
+  "email": "joe@example.com"
+  ,"address":"oe_123 main st"
+}'
+
+---------------------------------
+All_user GET http://localhost:8080/users
+
+------------------------------------
+Update_user PATCH http://localhost:8080/users/12
+
+curl --location --request PATCH 'http://localhost:8080/users/12' \
+--header 'Content-Type: application/json' \
+--data '{
+ 
+ 
+  "address":"yoyyyyyyyyyyy"
+}'
+-----------------------------------
+PUDATE_USER
+curl --location --request PUT 'http://localhost:8080/users/2' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "name": "up_1",
+  "email": "up_1@example.com"
+  ,"address":"up_1_123 main st"
+}'
+------------------------------------------
+DELETE 
+
+curl --location --request DELETE 'http://localhost:8080/users/4'
+
+
+--------------------------------------------
+
+
+{
+  "info": {
+    "name": "TestDB API",
+    "_postman_id": "*****************************",
+    "description": "Postman collection for your TestDB API with all Users endpoints",
+    "schema": "*********************************************"
+  },
+  "item": [
+    {
+      "name": "Get All Users",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/users",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["users"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get User by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/users/7",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["users", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Name by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/users/8/name",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["users", "1", "name"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Email by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/users/7/email",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["users", "1", "email"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Address by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/users/7/address",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["users", "1", "address"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Charlie\",\n  \"email\": \"charlie@example.com\",\n  \"address\": \"123 Street\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/users",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["users"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update User (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updated@example.com\",\n  \"address\": \"New Address\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/users/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["users", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Patch User (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"patched@example.com\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/users/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["users", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete User",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/users/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["users", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Users by IDs (Query param)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/users/select?ids=7,8,9",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["users","select"],
+          "query": [
+            {
+              "key": "ids",
+              "value": "1,2,5"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

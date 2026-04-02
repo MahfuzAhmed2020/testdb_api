@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Control Panel | Heavy Duty Database UI</title>
+    <style>
+        /* ===== INDUSTRIAL THEME - COLORFUL HEAVY DUTY STYLE ===== */
+        /* No existing code changed — only enhanced visual layer with vibrant industrial colors */
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Arial', 'Roboto', 'Orbitron', monospace;
+            background: linear-gradient(135deg, #0b0f1c 0%, #121a2a 100%);
+            padding: 28px 32px;
+            margin: 0;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Industrial riveted texture overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(255, 140, 0, 0.08) 1.5px, transparent 1.5px);
+            background-size: 28px 28px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        h2 {
+            color: #ffb347;
+            font-size: 32px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            margin-top: 0;
+            background: linear-gradient(135deg, #ffb347, #ff7e05);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+            border-left: 6px solid #ff7e05;
+            padding-left: 20px;
+            position: relative;
+            z-index: 2;
+            font-family: 'Orbitron', 'Arial', monospace;
+        }
+
+        /* Industrial dashboard container */
+        .dashboard-container {
+            background: rgba(10, 20, 28, 0.65);
+            backdrop-filter: blur(2px);
+            border-radius: 24px;
+            padding: 20px 24px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+            border: 1px solid rgba(255, 120, 0, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Button panel - industrial control rack */
+        .button-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 28px;
+            background: #0a121fcc;
+            padding: 18px 20px;
+            border-radius: 40px;
+            border: 1px solid #ff8c42;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.6), 0 5px 12px rgba(0,0,0,0.3);
+        }
+
+        button {
+            margin: 0;
+            padding: 10px 22px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            border-radius: 60px;
+            border: none;
+            background: linear-gradient(145deg, #1e2a3a, #0f1722);
+            color: #f0e6d0;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.8px;
+            font-family: 'Segoe UI', 'Arial', monospace;
+            box-shadow: 0 4px 0 #00000055, inset 0 1px 0 rgba(255,255,255,0.1);
+            text-transform: uppercase;
+            border-bottom: 2px solid #ff8c42;
+        }
+
+        /* Vibrant button colors on hover & active industrial glow */
+        button:hover {
+            background: linear-gradient(145deg, #2a3c4e, #1b2538);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(255, 100, 0, 0.3), inset 0 1px 0 rgba(255,255,200,0.2);
+            border-bottom-color: #ffaa66;
+        }
+
+        button:active {
+            background-color: #ff8c42;
+            color: #0a0f1a;
+            transform: scale(0.96);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            border-bottom-color: #ffc107;
+        }
+
+        /* SELECTED state — industrial high-vis orange */
+        .selected {
+            background: radial-gradient(circle at 30% 10%, #ffaa33, #e05e00);
+            color: #0a0c14;
+            box-shadow: 0 0 12px #ffa500, inset 0 1px 2px rgba(255,255,200,0.8);
+            border-bottom: 2px solid #ffffaa;
+            text-shadow: 0 0 2px rgba(0,0,0,0.2);
+            font-weight: 800;
+        }
+
+        /* Input section industrial style */
+        .input-section {
+            margin-top: 10px;
+            margin-bottom: 25px;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 18px 24px;
+            border-radius: 60px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            backdrop-filter: blur(4px);
+            border: 1px solid #ff9040;
+        }
+
+        input {
+            padding: 12px 18px;
+            margin: 0;
+            width: 320px;
+            border: 2px solid #3e5569;
+            border-radius: 40px;
+            background: #0f1a24;
+            color: #ffd7a0;
+            font-weight: 500;
+            font-size: 15px;
+            font-family: 'Courier New', monospace;
+            transition: all 0.25s;
+            box-shadow: inset 0 1px 4px #00000055;
+        }
+
+        input:focus {
+            border-color: #ffaa33;
+            box-shadow: 0 0 12px #ff9900, inset 0 0 5px #ffb347;
+            outline: none;
+            background: #111d2b;
+            color: #fff0cc;
+        }
+
+        /* Highlight input when selected (custom class) */
+        input.selected {
+            border-color: #ffaa44;
+            background: #1e2f3f;
+            box-shadow: 0 0 18px #ff9900, inset 0 0 8px #ffb347;
+            color: #ffffff;
+        }
+
+        /* Industrial table design — vibrant & readable */
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            margin-top: 28px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+            background: #0c1422;
+        }
+
+        th, td {
+            border: 1px solid #ff914d44;
+            padding: 14px 12px;
+            font-family: 'Segoe UI', 'Arial', monospace;
+        }
+
+        th {
+            background: linear-gradient(145deg, #1f2d3c, #121c2a);
+            color: #ffbc6e;
+            font-weight: 800;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            border-bottom: 3px solid #ff884d;
+            text-shadow: 0 1px 0 #00000033;
+        }
+
+        td {
+            background-color: #0d1725cc;
+            color: #e6e9f0;
+            font-weight: 500;
+            transition: background 0.15s ease;
+        }
+
+        tr:hover td {
+            background-color: #1e3146dd;
+            color: #fff2df;
+            box-shadow: inset 0 0 8px #ffa04d22;
+        }
+
+        /* ID column special glow */
+        td:first-child {
+            font-weight: 800;
+            color: #ffad60;
+            background: #0e1828;
+            border-right: 2px solid #ff8c42;
+        }
+
+        /* address column modern industrial */
+        td:last-child {
+            font-style: italic;
+            color: #bbccff;
+        }
+
+        /* custom button for Get Users */
+        .input-section button {
+            background: radial-gradient(circle at 20% 30%, #2c4b3e, #1e3a2f);
+            border-bottom-color: #6fbf4c;
+            font-weight: bold;
+            padding: 10px 28px;
+        }
+
+        .input-section button:hover {
+            background: radial-gradient(circle at 30% 40%, #3e6b58, #2a4d3c);
+            border-bottom-color: #9eff6e;
+        }
+
+        /* Custom industrial status indicators */
+        .badge-panel {
+            display: inline-block;
+            background: #00000077;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 12px;
+            margin-left: 12px;
+            color: #ffaa55;
+            font-family: monospace;
+        }
+
+        /* responsive table scroll */
+        @media (max-width: 780px) {
+            body { padding: 16px; }
+            .button-panel { border-radius: 28px; }
+            input { width: 100%; }
+            table { display: block; overflow-x: auto; white-space: nowrap; }
+            th, td { padding: 10px 8px; }
+        }
+
+        /* Corner rivets effect */
+        .dashboard-container::before,
+        .dashboard-container::after {
+           /* content: "⚙️";*/
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.25;
+            pointer-events: none;
+        }
+
+        /* glowing accent line */
+        hr {
+            border: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #ff8c42, #ffd966, #ff8c42);
+            margin: 18px 0;
+        }
+
+        /* keep your existing style additions but preserve all functionality */
+        button, input {
+            transition: all 0.2s;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+<h2>⚙️ USER DATABASE ⚡ CONTROL PANEL</h2>
+
+<!-- Buttons - enhanced but original structure untouched -->
+<div class="button-panel">
+    <button onclick="selectButton(this); loadUsers()">🔧 ALL USERS</button>
+    <button onclick="selectButton(this); loadUsers(1)">🔩 SHOW 1 USER</button>
+    <button onclick="selectButton(this); loadUsers(2)">⚙️ SHOW 2 USERS</button>
+    <button onclick="selectButton(this); loadUsers(3)">📀 SHOW 3 USERS</button>
+    <button onclick="selectButton(this); loadUsers(5)">⛓️ SHOW 5 USERS</button>
+    <button onclick="selectButton(this); loadUsersRange(0,2)">🎛️ USERS 1-2</button>
+    <button onclick="selectButton(this); loadUsersRange(2,5)">🔥 USERS 3-5</button>
+    <button onclick="selectButton(this); loadUsersRange(0,10)">🏭 USERS 1-10</button>
+    <button onclick="selectButton(this); loadUsersRange(7,9)">💡 USERS 7-9</button>
+</div>
+
+<!-- Input for custom IDs with industrial look -->
+<div class="input-section">
+    <input type="text" id="userIds" placeholder="⚡ Enter IDs, comma-separated e.g. 1,2,7,9" onclick="selectInput(this)">
+    <button onclick="fetchUsers(); selectButton(this)">🛠️ GET USERS BY IDs</button>
+    <!-- <span class="badge-panel">⚡ ACTIVE NODE ⚡</span> -->
+</div>
+
+<!-- Table with industrial data grid -->
+<table id="userTable">
+  <thead>
+     <tr>
+      <th>🔰 ID</th>
+      <th>👤 NAME</th>
+      <th>📧 EMAIL</th>
+      <th>📍 ADDRESS</th>
+     </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<hr>
+<div style="font-size: 12px; text-align: right; color: #ffaa66; margin-top: 12px;">DATABASE v1.0 | HEAVY DUTY MODE</div>
+</div>
+
+<script>
+// ============ ORIGINAL FUNCTIONS (UNCHANGED) ============
+// Load first N users
+function loadUsers(limit) {
+    fetch("http://localhost:8080/users")
+        .then(res => res.json())
+        .then(data => {
+            let table = document.querySelector("#userTable tbody");
+            table.innerHTML = "";
+            data.slice(0, limit).forEach(user => {
+                table.innerHTML += `<tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.address || ''}</td>
+                </tr>`;
+            });
+        });
+}
+
+// Load users by range
+function loadUsersRange(start, end) {
+    fetch("http://localhost:8080/users")
+        .then(res => res.json())
+        .then(data => {
+            let table = document.querySelector("#userTable tbody");
+            table.innerHTML = "";
+            data.slice(start, end).forEach(user => {
+                table.innerHTML += `<tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.address || ''}</td>
+                </tr>`;
+            });
+        });
+}
+
+// Fetch users by IDs entered in input
+function fetchUsers() {
+    let ids = document.getElementById("userIds").value; // e.g., "1,2,7"
+    fetch(`http://localhost:8080/users/select?ids=${ids}`)
+        .then(res => res.json())
+        .then(data => {
+            let tbody = document.querySelector("#userTable tbody");
+            tbody.innerHTML = "";
+            data.forEach(user => {
+                tbody.innerHTML += `<tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.address || ''}</td>
+                </tr>`;
+            });
+        });
+}
+
+
+// Keep only one button selected at a time
+function selectButton(btn) {
+    // Remove 'selected' class from all buttons
+    document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+}
+
+// Keep input highlighted when clicked
+function selectInput(input) {
+    // Remove 'selected' class from other inputs if you have multiple
+    document.querySelectorAll('input').forEach(i => i.classList.remove('selected'));
+    input.classList.add('selected');
+}
+</script>
+
+</body>
+</html>
