@@ -51,6 +51,28 @@ public List<User> getUsersByIds(@RequestParam List<Long> ids) {
     return userRepository.findAllById(ids);
 }
 
+// //Query parameters for filtering users by name, email, or address
+
+// @GetMapping("/{id}")
+// public Object getUserField(@PathVariable Long id,
+//                           @RequestParam(required = false) String field) {
+//     User user = userRepository.findById(id)
+//         .orElseThrow(() -> new RuntimeException("User not found"));
+
+//     if (field == null) return user;
+
+//     switch (field) {
+//         case "name": return user.getName();
+//         case "email": return user.getEmail();
+//         case "address": return user.getAddress();
+//         default: throw new RuntimeException("Invalid field");
+//     }
+// }
+
+
+
+
+
 
     // GET product by id
     @GetMapping("/{id}")
