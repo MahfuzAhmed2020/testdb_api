@@ -1,194 +1,115 @@
-HOW TO ADD A PROJECT TO DOCKER AND PUSH IT TO DOCKER HUB
+DOCKER WORKFLOW FOR THIS PROJECT
 
-Step 1: Create a Dockerfile
-The Dockerfile defines how Docker will build your application image.
+Project name:
+- testdb_api
 
-Add this Dockerfile in the project root:
+Local files already prepared:
+- Dockerfile
+- .dockerignore
+- docker-compose.yml
 
-FROM maven:3.9.9-eclipse-temurin-17 AS build
-WORKDIR /app
+Docker image recommendation:
+- mahfuzdocker20/testdb_api:latest
 
-COPY pom.xml .
-RUN mvn dependency:go-offline
+1. Build the Spring Boot image locally
 
-COPY src src
-RUN mvn clean package -DskipTests
+Command:
+docker build -t mahfuzdocker20/testdb_api:latest .
 
-FROM eclipse-temurin:17-jre
-WORKDIR /app
+What it does:
+- Builds the application image from the Dockerfile in the project root.
+- Packages the Spring Boot app into a Java 17 runtime image.
 
-COPY --from=build /app/target/*.jar app.jar
+2. Run the full stack with MySQL by using Docker Compose
 
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
-
-Description:
-- The first stage uses Maven and Java 17 to build the Spring Boot project.
-- The second stage creates a smaller runtime image using only Java 17 JRE.
-- The packaged JAR file is copied into the final image and started with java -jar.
-
-Step 2: Create a .dockerignore file
-The .dockerignore file prevents unnecessary files from being copied into the Docker build context.
-
-Add this .dockerignore file in the project root:
-
-target
-.git
-.gitignore
-.vscode
-HELP.md
-
-Description:
-- This keeps the image build smaller and faster.
-- It avoids copying local build folders and Git metadata into the image.
-
-Step 3: Make application.properties work in Docker
-When a project runs inside Docker, localhost inside the container does not mean your host machine. It means the container itself.
-Because of that, datasource settings should use environment variables.
-
-Update application.properties like this:
-
-spring.application.name=testdb_api
-spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/testdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
-spring.datasource.username=${SPRING_DATASOURCE_USERNAME:root}
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:root}
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-spring.jpa.hibernate.ddl-auto=${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
-server.port=${SERVER_PORT:8080}
-
-Description:
-- The default values allow local development to continue working.
-- Docker Compose can override these values by passing environment variables.
-- allowPublicKeyRetrieval=true helps the app connect to MySQL 8 containers.
-
-Step 4: Create docker-compose.yml
-Docker Compose is used to run the full project with multiple containers, such as the app and database.
-
-Add this docker-compose.yml in the project root:
-
-services:
-  db:
-    image: mysql:8.0
-    container_name: testdb_mysql
-    environment:
-      MYSQL_DATABASE: testdb
-      MYSQL_ROOT_PASSWORD: root
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: testdb_api_app
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/testdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SERVER_PORT: 8080
-    ports:
-      - "8080:8080"
-
-volumes:
-  mysql_data:
-
-Description:
-- The db service starts a MySQL 8 container.
-- The app service builds your Spring Boot image from the Dockerfile.
-- The app connects to MySQL using the Docker service name db.
-- Port 8080 is exposed so the application can be reached from the browser.
-
-Step 5: Build and run the project in Docker
-Run the following command in the project root:
-
+Command:
 docker compose up --build
 
-Description:
-- This builds the app image and starts both the application and MySQL containers.
-- If everything starts correctly, the project should be available at:
+What it does:
+- Starts a MySQL 8 container named testdb_mysql
+- Builds and starts the Spring Boot app container named testdb_api_app
+- Exposes the API on:
   http://localhost:8080
 
-Useful Docker Compose commands:
+3. Useful Docker commands
 
+Check running containers:
 docker compose ps
+
+View app logs:
 docker compose logs -f app
+
+Stop the stack:
 docker compose down
 
-Step 6: Build a Docker image for Docker Hub
-Before pushing to Docker Hub, build the image with your Docker Hub username and repository name.
+4. Push this project image to Docker Hub
 
-Command format:
+Recommended image tag:
+docker build -t mahfuzdocker20/testdb_api:latest .
 
-docker build -t your_dockerhub_username/your_image_name:latest .
-
-Example:
-
-docker build -t mahfu/testdb_api:latest .
-
-Description:
-- This creates a local Docker image with the correct Docker Hub tag.
-- Replace mahfu with your actual Docker Hub username.
-
-Step 7: Log in to Docker Hub
-Use Docker login from the terminal:
-
+Login:
 docker login
 
-Description:
-- Docker will ask for your Docker Hub username and password.
-- If you use Docker Hub access tokens, you can use the token instead of your password.
+Push:
+docker push mahfuzdocker20/testdb_api:latest
 
-Step 8: Push the image to Docker Hub
-After login, push the image:
+Optional extra version tag:
+docker tag mahfuzdocker20/testdb_api:latest mahfuzdocker20/testdb_api:v1
+docker push mahfuzdocker20/testdb_api:v1
 
-docker push your_dockerhub_username/your_image_name:latest
+5. Pull and run from Docker Hub
+
+Pull:
+docker pull mahfuzdocker20/testdb_api:latest
+
+Run only the application container:
+docker run -p 8080:8080 mahfuzdocker20/testdb_api:latest
+
+Important note:
+- The application needs MySQL.
+- If you run only the app image, make sure it can reach a MySQL database through the environment variables below.
+
+Required environment variables for containerized deployment:
+- SPRING_DATASOURCE_URL
+- SPRING_DATASOURCE_USERNAME
+- SPRING_DATASOURCE_PASSWORD
+- SPRING_JPA_HIBERNATE_DDL_AUTO
+- SERVER_PORT
 
 Example:
+docker run -p 8080:8080 ^
+  -e SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/testdb?useSSL=false^&allowPublicKeyRetrieval=true^&serverTimezone=UTC ^
+  -e SPRING_DATASOURCE_USERNAME=root ^
+  -e SPRING_DATASOURCE_PASSWORD=root ^
+  -e SPRING_JPA_HIBERNATE_DDL_AUTO=update ^
+  -e SERVER_PORT=8080 ^
+  mahfuzdocker20/testdb_api:latest
 
-docker push mahfu/testdb_api:latest
+6. Repository description for Docker Hub
 
-Description:
-- This uploads your image to your Docker Hub repository.
-- Once uploaded, the image can be pulled on another machine.
+Suggested short description:
+- Spring Boot 4 REST API for user data with MySQL 8, Docker, and Docker Compose support.
 
-Step 9: Verify the image on Docker Hub
-After the push completes:
-- Open Docker Hub in your browser.
-- Sign in to your account.
-- Confirm that the repository and image tag appear in your account.
+Suggested overview:
+- This project is a Spring Boot 4 REST API that manages user records stored in MySQL.
+- It supports create, read, update, patch, delete, range selection, limited fetch, and ID-based selection endpoints.
+- The repository includes Docker and Docker Compose configuration for local development and containerized deployment.
 
-Step 10: Pull and run the image from Docker Hub
-On any machine with Docker installed, you can pull and run the image.
+7. Current API base URL
 
-Pull command:
+Local:
+- http://localhost:8080/users
 
-docker pull your_dockerhub_username/your_image_name:latest
-
-Run command:
-
-docker run -p 8080:8080 your_dockerhub_username/your_image_name:latest
-
-Description:
-- docker pull downloads the image from Docker Hub.
-- docker run starts a container from that image.
-- If your app requires MySQL, you should also run the database container or use Docker Compose.
-
-Summary of what was added for this project:
-- A Dockerfile was added to build and run the Spring Boot app.
-- A .dockerignore file was added to reduce unnecessary build context.
-- application.properties was updated to support environment-based Docker configuration.
-- A docker-compose.yml file was added to run the app and MySQL together.
-- The JDBC URL was adjusted for MySQL 8 Docker authentication.
-- The application was built and started successfully in Docker.
+Main endpoints:
+- GET /users
+- GET /users/limit?size=3
+- GET /users/range?start=0&end=3
+- GET /users/select?ids=1,2,3
+- GET /users/{id}
+- GET /users/{id}/name
+- GET /users/{id}/email
+- GET /users/{id}/address
+- POST /users
+- PUT /users/{id}
+- PATCH /users/{id}
+- DELETE /users/{id}

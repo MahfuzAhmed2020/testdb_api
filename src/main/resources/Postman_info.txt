@@ -1,0 +1,293 @@
+TESTDB_API API DOCUMENTATION WITH CURL
+
+Base URL:
+http://localhost:8080
+
+Main resource:
+/users
+
+Content type for write requests:
+Content-Type: application/json
+
+User JSON structure:
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "address": "New York"
+}
+
+1. Get all users
+
+Method:
+GET
+
+Endpoint:
+/users
+
+curl:
+curl -X GET "http://localhost:8080/users"
+
+Success response:
+- 200 OK
+- Returns a JSON array of users
+
+2. Get users with limit
+
+Method:
+GET
+
+Endpoint:
+/users/limit?size=3
+
+curl:
+curl -X GET "http://localhost:8080/users/limit?size=3"
+
+Query parameter:
+- size: number of users to return from the first page
+
+Success response:
+- 200 OK
+- Returns a limited JSON array of users
+
+3. Get users by range
+
+Method:
+GET
+
+Endpoint:
+/users/range?start=0&end=3
+
+curl:
+curl -X GET "http://localhost:8080/users/range?start=0&end=3"
+
+Query parameters:
+- start: zero-based inclusive index
+- end: exclusive index
+
+Validation:
+- start must be 0 or greater
+- end must be greater than start
+
+Success response:
+- 200 OK
+- Returns a sub-list of users from start to end
+
+Error behavior:
+- Throws runtime error with message:
+  Invalid range
+
+4. Get selected users by IDs
+
+Method:
+GET
+
+Endpoint:
+/users/select?ids=1,2,3
+
+curl:
+curl -X GET "http://localhost:8080/users/select?ids=1,2,3"
+
+Query parameter:
+- ids: comma-separated user IDs
+
+Success response:
+- 200 OK
+- Returns the matching users
+
+5. Get user by ID
+
+Method:
+GET
+
+Endpoint:
+/users/{id}
+
+curl:
+curl -X GET "http://localhost:8080/users/1"
+
+Path parameter:
+- id: user ID
+
+Success response:
+- 200 OK
+- Returns one user object
+
+Error behavior:
+- Throws runtime error if the user does not exist
+
+6. Get user name by ID
+
+Method:
+GET
+
+Endpoint:
+/users/{id}/name
+
+curl:
+curl -X GET "http://localhost:8080/users/1/name"
+
+Success response:
+- 200 OK
+- Returns the user name as plain text
+
+7. Get user email by ID
+
+Method:
+GET
+
+Endpoint:
+/users/{id}/email
+
+curl:
+curl -X GET "http://localhost:8080/users/1/email"
+
+Success response:
+- 200 OK
+- Returns the user email as plain text
+
+8. Get user address by ID
+
+Method:
+GET
+
+Endpoint:
+/users/{id}/address
+
+curl:
+curl -X GET "http://localhost:8080/users/1/address"
+
+Success response:
+- 200 OK
+- Returns the user address as plain text
+
+9. Create a new user
+
+Method:
+POST
+
+Endpoint:
+/users
+
+curl:
+curl -X POST "http://localhost:8080/users" \
+  -H "Content-Type: application/json" \
+  -d "{\"name\":\"Charlie\",\"email\":\"charlie@example.com\",\"address\":\"NY\"}"
+
+Request body:
+{
+  "name": "Charlie",
+  "email": "charlie@example.com",
+  "address": "NY"
+}
+
+Success response:
+- 200 OK
+- Returns the created user with generated id
+
+10. Full update user
+
+Method:
+PUT
+
+Endpoint:
+/users/{id}
+
+curl:
+curl -X PUT "http://localhost:8080/users/1" \
+  -H "Content-Type: application/json" \
+  -d "{\"name\":\"Updated User\",\"email\":\"updated@example.com\",\"address\":\"Boston\"}"
+
+Request body:
+{
+  "name": "Updated User",
+  "email": "updated@example.com",
+  "address": "Boston"
+}
+
+Success response:
+- 200 OK
+- Returns the fully updated user
+
+Error behavior:
+- Throws runtime error if the user does not exist
+
+11. Partial update user
+
+Method:
+PATCH
+
+Endpoint:
+/users/{id}
+
+curl:
+curl -X PATCH "http://localhost:8080/users/1" \
+  -H "Content-Type: application/json" \
+  -d "{\"name\":\"UpdatedName\"}"
+
+Example request body:
+{
+  "name": "UpdatedName"
+}
+
+Supported patch fields:
+- name
+- email
+- address
+
+Success response:
+- 200 OK
+- Returns JSON with:
+  message
+  changedFields
+  user
+
+Example response shape:
+{
+  "message": "User updated successfully",
+  "changedFields": {
+    "name": {
+      "old": "Old Name",
+      "new": "UpdatedName"
+    }
+  },
+  "user": {
+    "id": 1,
+    "name": "UpdatedName",
+    "email": "john@example.com",
+    "address": "New York"
+  }
+}
+
+12. Delete user
+
+Method:
+DELETE
+
+Endpoint:
+/users/{id}
+
+curl:
+curl -X DELETE "http://localhost:8080/users/1"
+
+Success response:
+- 200 OK
+- Returns JSON with:
+  message
+  deletedUser
+
+Example response shape:
+{
+  "message": "User deleted successfully",
+  "deletedUser": {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "address": "New York"
+  }
+}
+
+Notes:
+- This project currently exposes REST endpoints, but it does not include Swagger UI or an OpenAPI dependency.
+- This file is a Swagger-style reference written manually from the controller code, using curl examples for each endpoint.
+- If you want, Swagger UI can be added later with springdoc-openapi.
