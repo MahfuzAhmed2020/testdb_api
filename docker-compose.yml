@@ -1,4 +1,23 @@
 services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: jenkins/Dockerfile
+    container_name: testdb_jenkins
+    restart: unless-stopped
+    environment:
+      JAVA_OPTS: -Djenkins.install.runSetupWizard=false
+      CASC_JENKINS_CONFIG: /var/jenkins_home/casc.yaml
+      JENKINS_ADMIN_ID: ${JENKINS_ADMIN_ID:-admin}
+      JENKINS_ADMIN_PASSWORD: ${JENKINS_ADMIN_PASSWORD:?Set JENKINS_ADMIN_PASSWORD in .env before starting Jenkins}
+      JENKINS_GITHUB_REPO_URL: https://github.com/MahfuzAhmed2020/testdb_api.git
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+
   db:
     image: mysql:8.0
     container_name: testdb_mysql
@@ -32,3 +51,4 @@ services:
 
 volumes:
   mysql_data:
+  jenkins_home:
