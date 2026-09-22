@@ -1,5 +1,5 @@
 DOCKER WORKFLOW FOR THIS PROJECT
-
+docker exec -it testdb_mysql mysql -u root -proot testdb
 Project name:
 - testdb_api
 

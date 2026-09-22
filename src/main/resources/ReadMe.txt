@@ -1,4 +1,4 @@
-TestDB API Project
+## TestDB API Project
 Overview
 
 This project is a Spring Boot API that interacts with a MySQL database (testdb) and provides CRUD operations for a User table.
