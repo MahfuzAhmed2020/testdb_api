@@ -33,8 +33,7 @@ Username: value of JENKINS_ADMIN_ID in .env
 Password: value of JENKINS_ADMIN_PASSWORD in .env
 ```
 
-This Jenkins container mounts the Docker socket so it can build application images.
-Only run it on a machine where you trust the Jenkins jobs and repository code.
+This Jenkins container runs Maven builds only. It does not mount the Docker socket.
 
 ## GitHub Push Build
 
@@ -42,9 +41,7 @@ The Jenkins job is created automatically as a pipeline named `testdb_api`.
 It reads this repository's `Jenkinsfile` and builds with:
 
 ```text
-temporary MySQL 8 container for CI tests
 mvn -B clean verify
-docker build -t testdb-api:<commit> -t testdb-api:latest .
 ```
 
 To trigger builds when code is pushed to GitHub, add a GitHub repository webhook:
