@@ -1,0 +1,331 @@
+<!-- http://localhost:8080/post_user_only.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>post_user_only</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* Button used to open the POST form */
+        .post-button {
+            background-color: #198754;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .post-button:hover {
+            background-color: #146c43;
+        }
+
+        /* POST form is hidden initially */
+        #userForm {
+            display: none;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .submit-button {
+            margin-top: 15px;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background-color: #0b5ed7;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #343a40;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #message {
+            margin-top: 15px;
+            padding: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>post_user_only</h1>
+
+        <!-- POST BUTTON -->
+        <button class="post-button" onclick="showPostForm()">
+            + Add User
+        </button>
+
+        <!-- POST FORM -->
+        <div id="userForm">
+
+            <h2>Create New User</h2>
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter name">
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Enter email">
+
+            <label for="address">Address:</label>
+            <input type="text" id="address" placeholder="Enter address">
+
+            <button class="submit-button" onclick="createUser()">
+                POST User
+            </button>
+
+            <div id="message"></div>
+
+        </div>
+
+        <!-- USER TABLE -->
+        <h2>Users</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+
+            <tbody id="userTableBody">
+            </tbody>
+        </table>
+
+    </div>
+
+
+    <script>
+
+        /*
+         * Show the POST form when
+         * the "+ Add User" button is clicked.
+         */
+        function showPostForm() {
+
+            document.getElementById("userForm").style.display = "block";
+
+        }
+
+
+        /*
+         * Send POST request to:
+         *
+         * http://localhost:8080/users
+         *
+         * This matches your Spring Boot:
+         *
+         * @PostMapping
+         * public User createUser(...)
+         */
+        async function createUser() {
+
+            // Get values from HTML input fields
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const address = document.getElementById("address").value;
+
+            // Create JavaScript object
+            const user = {
+                name: name,
+                email: email,
+                address: address
+            };
+
+            try {
+
+                /*
+                 * Send POST request to Spring Boot
+                 */
+                const response = await fetch("http://localhost:8080/users", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(user)
+                });
+
+
+                /*
+                 * Check whether the POST request succeeded
+                 */
+                if (!response.ok) {
+
+                    throw new Error("Failed to create user");
+
+                }
+
+
+                /*
+                 * Convert Spring Boot JSON response
+                 * into JavaScript object.
+                 */
+                const createdUser = await response.json();
+
+
+                /*
+                 * Display success message.
+                 */
+                document.getElementById("message").innerHTML =
+                    "User created successfully! ID: " + createdUser.id;
+
+
+                /*
+                 * Clear the input fields.
+                 */
+                document.getElementById("name").value = "";
+                document.getElementById("email").value = "";
+                document.getElementById("address").value = "";
+
+
+                /*
+                 * Refresh the user table.
+                 */
+                loadUsers();
+
+            } catch (error) {
+
+                document.getElementById("message").innerHTML =
+                    "Error: " + error.message;
+
+            }
+        }
+
+
+        /*
+         * GET existing users.
+         *
+         * This calls your:
+         *
+         * @GetMapping
+         * public List<User> getAllUsers()
+         */
+        async function loadUsers() {
+
+            try {
+
+                const response =
+                    await fetch("http://localhost:8080/users");
+
+                const users = await response.json();
+
+                const tableBody =
+                    document.getElementById("userTableBody");
+
+                /*
+                 * Clear existing table rows.
+                 */
+                tableBody.innerHTML = "";
+
+
+                /*
+                 * Add each user to the table.
+                 */
+                users.forEach(user => {
+
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.address || ""}</td>
+                    `;
+
+                    tableBody.appendChild(row);
+
+                });
+
+            } catch (error) {
+
+                console.error("Error loading users:", error);
+
+            }
+        }
+
+
+        /*
+         * Load users automatically
+         * when the page opens.
+         */
+        // loadUsers();
+
+    </script>
+
+</body>
+
+</html>

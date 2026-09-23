@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POST Response Table</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        h2 {
+            color: black;
+        }
+
+        #heading {
+            margin-top: 20px;
+            font-weight: bold;
+            background-color: #fdfdfd;
+            border: 2px solid black;
+            padding: 10px;
+            display: inline-block;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 600px;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eeeeee;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+            background-color: #adc911;
+            border: 2px solid black;
+            padding: 10px;
+            display: inline-block;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <h2 id="heading">POST Response: REQUESTING http://localhost:8080/HI/hello4</h2>
+    <div></div>
+    <button onclick="sendPost()">Send POST</button>
+
+    <!-- Table will be created here -->
+    <table id="dataTable">
+
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+
+        <tbody id="tableBody">
+        </tbody>
+
+    </table>
+
+    <div id="message"></div>
+
+
+    <script>
+
+        async function sendPost() {
+
+            // Send POST request to Spring Boot
+            const response = await fetch(
+                "http://localhost:8080/HI/hello4",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    // JSON payload
+                    body: JSON.stringify({
+                        name: "aaaaaaa",
+                        age: 25,
+                        city: "Buffalo",
+                        area: "ny"
+                    })
+                }
+            );
+
+            // Convert response to JSON
+            const data = await response.json();
+
+            // Get the received payload
+            const receivedData = data.received;
+
+            // Get table body
+            const tableBody = document.getElementById("tableBody");
+
+            // Clear previous table data
+            tableBody.innerHTML = "";
+
+            // Loop through the received JSON fields
+            for (const key in receivedData) {
+
+                // Create table row
+                const row = document.createElement("tr");
+
+                // Create field cell
+                const fieldCell = document.createElement("td");
+
+                // Create value cell
+                const valueCell = document.createElement("td");
+
+                // Put key and value into cells
+                fieldCell.textContent = key;
+                valueCell.textContent = receivedData[key];
+
+                // Add cells to row
+                row.appendChild(fieldCell);
+                row.appendChild(valueCell);
+
+                // Add row to table
+                tableBody.appendChild(row);
+            }
+
+            // Display message from Spring Boot
+            document.getElementById("message").textContent =
+                data.message;
+        }
+
+    </script>
+
+</body>
+
+</html>
+
+
+
+
+
+<!-- <!DOCTYPE html>
+<html>
+
+<body>
+
+    <h2 color="blue">POST Response:</h2>
+    <pre id="output"></pre>
+
+    <button onclick="sendPost()">Send POST</button>
+
+    <script>
+        async function sendPost() {
+            const response = await fetch("http://localhost:8080/HI/hello4", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    name: "aaaaaaa",
+                    age: 25,
+                    city: "Buffalo",
+                    area: "ny"
+                })
+            });
+            const data = await response.json();
+
+            // Display on page
+            document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+        }
+    </script>
+
+</body>
+
+</html> -->

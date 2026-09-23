@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<!-- http://localhost:8080/single_datafrmDB.html  -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+
+    <title>Reading the database with API</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            width: 70%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        #message {
+            width: 70%;
+            margin: 20px auto;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            background-color: #adc911;
+            border: 2px solid #333;
+            border-radius: 8px;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+
+    <h1>Reading the database with API</h1>
+
+    <!--
+    This message area will show:
+    - Loading message
+    - Error message
+    - Number of users retrieved
+-->
+    <div id="message">Loading users...</div>
+
+    <!--
+    This table will contain ONLY:
+    1. Name
+    2. Email
+-->
+    <table>
+
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+
+        <tbody id="userTableBody">
+            <!-- JavaScript will add users here -->
+        </tbody>
+
+    </table>
+
+
+    <script>
+
+        /*
+         * Call the Spring Boot REST API.
+         *
+         * Your controller/API should return something similar to:
+         *
+         * [
+         *     {
+         *         "id": 1,
+         *         "name": "John",
+         *         "email": "john@gmail.com",
+         *         "address": "New York"
+         *     }
+         * ]
+         */
+        fetch("http://localhost:8080/users")
+
+            // Convert the HTTP response into JSON
+            .then(response => {
+
+                // Check if the API returned an error
+                if (!response.ok) {
+                    throw new Error("HTTP error: " + response.status);
+                }
+
+                return response.json();
+            })
+
+            // Process the JSON data
+            .then(users => {
+
+                // Get the table body
+                const tableBody = document.getElementById("userTableBody");
+
+                // Get the message area
+                const message = document.getElementById("message");
+
+                // Clear the loading message
+                message.textContent =
+                    users.length + " user(s) retrieved successfully.";
+
+                // Loop through every user returned by Spring Boot
+                users.forEach(user => {
+
+                    // Create a new table row
+                    const row = document.createElement("tr");
+
+                    // Create Name column
+                    const nameCell = document.createElement("td");
+                    nameCell.textContent = user.name;
+
+                    // Create Email column
+                    const emailCell = document.createElement("td");
+                    emailCell.textContent = user.email;
+
+                    // Add Name and Email to the row
+                    row.appendChild(nameCell);
+                    row.appendChild(emailCell);
+
+                    // Add the row to the table
+                    tableBody.appendChild(row);
+                });
+            })
+
+            // Handle API/network errors
+            .catch(error => {
+
+                console.error("Error:", error);
+
+                document.getElementById("message").textContent =
+                    "Unable to retrieve users.";
+
+                document.getElementById("message").style.backgroundColor =
+                    "#ffcccc";
+            });
+
+    </script>
+
+
+</body>
+
+</html>
