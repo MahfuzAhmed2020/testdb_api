@@ -5,6 +5,8 @@ the project performs CRUD operations and display the data on UI
 it has two tables in the Docker Desktop
 
 To run this project: 
+docker stop $(docker ps -q) 
+
 PS C:\Users\mahfu\Desktop\testdb_api> docker-compose up -d   
 then follow: http://localhost:8080/
 
